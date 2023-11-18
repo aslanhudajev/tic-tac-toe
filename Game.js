@@ -4,25 +4,23 @@
 const Player = (function () {
     let sign = "";
 
-    function MakeMove () {
-        let row = prompt ("what row would you like to press?");
-        let col = prompt ("What column would you like to press?");
-
-        return [row, col];
+    function MadeMove () {
+        GameManager.SetCpuTurn()
     }
 
     function SetSign () {
-        sign = prompt("What sign would you like?");
+        sign = "X";
     }
 
     function GetSign () {
         return sign;
     }
 
-    return { MakeMove, SetSign, GetSign };
+    return { MadeMove, SetSign, GetSign };
 })();
 
 //CPU player object - singleton - factory
+
 const CPU = (function () {
     let sign = ""
 
@@ -37,10 +35,15 @@ const CPU = (function () {
         return sign;
     }
 
-    function MakeMove (possibleChoices) {
+    function MakeMove () {
+        let possibleChoices = Gameboard.GetNonPressedCells();
         console.log(possibleChoices);
-        cellChoice = RandomRange(possibleChoices.length);
-        return possibleChoices[cellChoice].GetCoord();
+
+        let cellChoiceIndex = RandomRange(possibleChoices.length);
+        let cellChoiceCoord = possibleChoices[cellChoiceIndex].GetCoord();
+        Gameboard.SetMark(cellChoiceCoord[0], cellChoiceCoord[1], sign);
+        GameManager.CheckForWinner();
+        GameManager.SetPlayerTurn();
     }
 
     function RandomRange (r) {
@@ -81,6 +84,22 @@ function CreateCell (row, col) {
     return { Press, ClearPress, GetIsPressed, GetPressedBy, GetCoord };
 }
 
+//Event manager object - singleton - factory
+
+let EventManager = (function () {
+    function CellPressed (e, r, c) {
+        if (GameManager.GetPlayerTurn) {
+            //Player made a move - through a click
+            Gameboard.SetMark(e.target.dataset.rowcol.substring(0, 1), e.target.dataset.rowcol.substring(1), Player.GetSign());
+            GameManager.CheckForWinner();
+            Player.MadeMove();
+            CPU.MakeMove();
+            e.stopPropagation();       
+        }
+    }
+    return { CellPressed }
+})()
+
 //Gameboard object - singleton - factory
 
 const Gameboard = (function () {
@@ -89,34 +108,36 @@ const Gameboard = (function () {
 
     let board = [];
 
-    //init
-    for (let r = 0; r < ROW; r++) {
-        board[r] = [];
-        for (let c = 0; c < COL; c++) {
-            board[r].push(CreateCell(r, c));
-        }
-    }
+    let boardHtmlContainer = document.querySelector(".board");
+    let cellHtmlTemplate = document.querySelector("#cell-template");
 
-    Render();
+    //init
+    function CreateBoard () {
+        for (let r = 0; r < ROW; r++) {
+            board[r] = [];
+            for (let c = 0; c < COL; c++) {
+                board[r].push(CreateCell(r, c));
+
+                let cellHtml = cellHtmlTemplate.content.cloneNode(true).querySelector("div");
+                cellHtml.classList.add("cell");
+                cellHtml.dataset.rowcol= r.toString() + c.toString();
+                cellHtml.addEventListener("click", EventManager.CellPressed);
+
+                boardHtmlContainer.appendChild(cellHtml);
+            }
+        }
+        Render();
+    }
 
     function Render () {
         for (let r = 0; r < ROW; r++) {
-            let boardStr = "/"
             for (let c = 0; c < COL; c++) {
-                if (board[r][c].GetIsPressed() === false)
-                    boardStr += "[ ]"
-                else
-                    boardStr += `[${board[r][c].GetPressedBy()}]`;
+                currentCellSignHtml = boardHtmlContainer.querySelector(`[data-rowcol="${r}${c}"]> h1`);
+                currentCellSign = board[r][c].GetPressedBy();
+                
+                currentCellSignHtml.textContent = currentCellSign;
             }
-            boardStr += "/";
-
-            console.log(boardStr);
         }
-    }
-
-    function SetMark (row, col, sign) {
-        board[row][col].Press(sign);
-        Render();
     }
 
     function GetNonPressedCells () {
@@ -127,7 +148,6 @@ const Gameboard = (function () {
                     nonPressedCells.push(board[r][c]);
             }
         }
-
         return nonPressedCells;
     }
 
@@ -138,9 +158,20 @@ const Gameboard = (function () {
                 board[r][c].ClearPress();
             }
         }
+
+        Render();
     }
 
-    return { ClearBoard, SetMark, GetNonPressedCells }
+    function GetCell (r, c) {
+        return board[r][c];
+    } 
+
+    function SetMark (row, col, sign) {
+        board[row][col].Press(sign);
+        Render();
+    }
+
+    return { ClearBoard, SetMark, GetCell, GetNonPressedCells, CreateBoard }
 })();
 
 //Game manager object - singleton - factory
@@ -148,31 +179,100 @@ const Gameboard = (function () {
 const GameManager = (function () {
     let gameWon = false;
     let winner = "";
+
+    let playerTurn = false;
+    let cpuTurn = false;
+
+    let winningCombos = [
+        [[0, 0], [0, 1], [0, 2]],   // X X X
+                                    // 0 0 0
+                                    // 0 0 0
+
+        [[1, 0], [1, 1], [1, 2]],   // 0 0 0
+                                    // X X X
+                                    // 0 0 0
+
+        [[2, 0], [2, 1], [2, 2]],   // 0 0 0
+                                    // 0 0 0
+                                    // X X X
+
+        [[0, 0], [1, 0], [2, 0]],   // X 0 0
+                                    // X 0 0
+                                    // X 0 0
+
+        [[0, 1], [1, 1], [2, 1]],   // 0 X 0
+                                    // 0 X 0
+                                    // 0 X 0
+
+        [[0, 2], [1, 2], [2, 2]],   // 0 0 X
+                                    // 0 0 X
+                                    // 0 0 X
+
+        [[0, 0], [1, 1], [2, 2]],   // X 0 0
+                                    // 0 X 0
+                                    // 0 0 X
+
+        [[0, 2], [1, 1], [2, 0]],   // 0 0 X
+                                    // 0 X 0
+                                    // X 0 0
+    ]
     
     function Init () {
         Player.SetSign();
         CPU.SetSign();
-
-        StartGame();
-    }
-
-    function StartGame () {
-        while (gameWon == false) {
-            let pChoiceArr = Player.MakeMove();
-            Gameboard.SetMark(pChoiceArr[0], pChoiceArr[1], Player.GetSign());
-
-            //CPU takes list of all non-pressed cells as argument, to help him/her make a choice.
-            let cpuChoiceArr = CPU.MakeMove(Gameboard.GetNonPressedCells());
-            Gameboard.SetMark(cpuChoiceArr[0], cpuChoiceArr[1], CPU.GetSign());
-
-            CheckForWinner();
-        }
-
+        Gameboard.CreateBoard();
     }
 
     function CheckForWinner () {
+        let playerStreakCounter = 0;
+        let cpuStreakCounter = 0;
 
+        for (const combo of winningCombos) {
+            for (const cell of combo) {
+                let currentCellSign = Gameboard.GetCell(cell[0], cell[1]).GetPressedBy();
+                if (currentCellSign === Player.GetSign()) {
+                    playerStreakCounter += 1;
+                    cpuStreakCounter = 0;
+                } else if (currentCellSign === CPU.GetSign()) {
+                    cpuStreakCounter += 1;
+                    playerStreakCounter = 0;
+                } else {
+                    playerStreakCounter = 0;
+                    cpuStreakCounter = 0;
+                }
+
+                if (playerStreakCounter === 3) {
+                    console.log("Player Won");
+                    RestartGame();
+                    break;
+                } else if (cpuStreakCounter === 3) {
+                    console.log("CPU Won");
+                    RestartGame();
+                    break;
+                }
+            }
+        }
+    }
+
+    function RestartGame () {
+        Gameboard.ClearBoard(); 
+    }
+
+    function SetPlayerTurn () {
+        cpuTurn = false;
+        playerTurn = true;
+    }
+
+    function GetPlayerTurn () {
+        return playerTurn;
+    }
+
+    function SetCpuTurn () {
+        playerTurn = false;
+        cpuTurn = true;
     }
 
     Init();
+
+    return { GetPlayerTurn, SetPlayerTurn, SetCpuTurn, CheckForWinner, RestartGame }
 })()

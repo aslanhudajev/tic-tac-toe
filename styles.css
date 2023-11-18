@@ -1,0 +1,60 @@
+:root {
+    font-size: 16px;
+    block-size: border-box;
+
+    font-family: 'Roboto', sans-serif;
+
+    --bg-color: rgb(249, 249, 249);
+    --cell-bg-color: rgb(221, 221, 221);
+}
+
+body {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    background-color: var(--bg-color);
+}
+
+h1, h2, h3, h4, h5, p {
+    margin: 0;
+}
+
+.cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    background-color: var(--cell-bg-color);
+}
+
+.cell > h1 {
+    position: absolute;
+    font-size: 6rem;
+}
+
+.df {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.fdc {
+    flex-direction: column;
+}
+
+.fdr {
+    flex-direction: row;
+}
+
+.dg {
+    width: 500px;
+    height: 500px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+
+    grid-gap: 20px;
+}
+
