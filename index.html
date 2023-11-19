@@ -6,13 +6,13 @@
     <title>Tic Tac Toe - Play Now!</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">    
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <script src="Game.js" defer></script>
 </head>
 <body>
-    <header class="head df fdr">
-        <h1 class="title">Tic Tac Toe</h1>
+    <header class="head df fdr aic jcc">
+        <h2 class="title">TICK TACK TOE</h2>
     </header>
     <div class="container df fdc aic jcsb">
         <div class="sign-picker df fdr">
@@ -25,12 +25,22 @@
         <div class="controls df fdr">
 
         </div>
+        <div class="credits">
+            <a class="credits-text" href="https://github.com/aslanhudajev">Copyright © 2023 @aslanhudajev</p>
+        </div>
     </div>
 
     <template id="cell-template">
         <div class="cell">
-            <h1 class="sign hidden"></h1>
+            <h1 class="sign"></h1>
         </div>
+    </template>
+
+    <template id="overlay-template">
+            <div class="overlay hidden df fdc aic jcc">
+                <h1 class="title"></h1>
+                <button class="btn" id="restart">Restart game</button>
+            </div>
     </template>
 </body>
 </html>

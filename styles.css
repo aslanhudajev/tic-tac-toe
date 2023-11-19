@@ -1,11 +1,36 @@
 :root {
+    --bg-color: rgb(255,255,255);
+    --bg-gradient: linear-gradient(144deg, rgba(255,255,255,1) 0%, rgba(227,201,233,1) 100%);
+
+    --cell-bg-color: rgb(196, 196, 196);
+    --overlay-bg-color: rgba(0, 0, 0, 0.35);
+    --glass-bg-color: rgba(255, 255, 255, 0.50);
+    --glass-hover-bg-color: rgba(255, 255, 255, 0.750);
+    --glass-active-bg-color: rgba(235, 235, 235, 0.50);
+
+
+    --board-width: 500px;
+    --board-height: 500px;
+
+    --flex-gap: 20px;
+    --grid-gap: 10px;
+
+    --overlay-text-color: rgb(230, 230, 230);
+
+    --border-radius: 10px;
+
+    --text-color: rgb(55, 55, 55);
+
     font-size: 16px;
-    block-size: border-box;
+    box-sizing: border-box;
 
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Open Sans', sans-serif;
 
-    --bg-color: rgb(249, 249, 249);
-    --cell-bg-color: rgb(221, 221, 221);
+    color: var(--text-color);
+}
+
+h1, h2, h3, h4, h5, p {
+    margin: 0;
 }
 
 body {
@@ -14,11 +39,45 @@ body {
     flex-direction: column;
     align-items: center;
 
-    background-color: var(--bg-color);
+    gap: var(--flex-gap);
+
+    height: 100vh;
+
+    background: var(--bg-gradient);
+    background-repeat: no-repeat;
 }
 
-h1, h2, h3, h4, h5, p {
-    margin: 0;
+.head {
+    width: 100%;
+    height: 20px;
+    padding: 20px;
+    
+    background: var(--glass-bg-color);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.container {
+    gap: var(--flex-gap);
+}
+
+.sign-picker {
+    gap: var(--flex-gap);
+}
+
+.overlay {
+    width: 500px;
+    height: 500px;
+
+    gap: var(--flex-gap);
+    position: fixed;
+
+    background-color: var(--overlay-bg-color);
+    color: var(--overlay-text-color);
+    
+    border-radius: var(--border-radius);
 }
 
 .cell {
@@ -27,7 +86,21 @@ h1, h2, h3, h4, h5, p {
     align-items: center;
     justify-content: center;
 
-    background-color: var(--cell-bg-color);
+    background: var(--glass-bg-color);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+
+    border-radius: var(--border-radius);
+}
+
+.cell:hover {
+    background: var(--glass-hover-bg-color);
+}
+
+.cell:active {
+    background: var(--glass-active-bg-color);
 }
 
 .cell > h1 {
@@ -35,10 +108,53 @@ h1, h2, h3, h4, h5, p {
     font-size: 6rem;
 }
 
+.btn {
+    background: var(--glass-bg-color);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+
+    font-size: 1.5rem;
+
+    height: 45px;
+    min-width: 100px;
+
+    border-radius: var(--border-radius);
+
+    font-weight: 900;
+
+    color: var(--text-color);
+
+    padding: 10px;
+}
+
+.btn:hover {
+    background: var(--glass-hover-bg-color);
+}
+
+.btn:active {
+    background: var(--glass-active-bg-color);
+}
+
 .df {
     display: flex;
+}
+
+.aic {
     align-items: center;
+}
+
+.jcc {
+    justify-content: center;
+}
+
+.jcsb {
     justify-content: space-between;
+}
+
+.jcsa {
+    justify-content: space-around;
 }
 
 .fdc {
@@ -50,11 +166,14 @@ h1, h2, h3, h4, h5, p {
 }
 
 .dg {
-    width: 500px;
-    height: 500px;
+    width: var(--board-width);
+    height: var(--board-height);
     display: grid;
     grid-template-columns: repeat(3, 1fr);
 
-    grid-gap: 20px;
+    grid-gap: var(--grid-gap);
 }
 
+.hidden {
+    display: none;
+}
