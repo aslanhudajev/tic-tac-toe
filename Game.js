@@ -1,4 +1,4 @@
-//TYPEDEF
+//TYPEDEFS
 const PLAYER_WIN = 1;
 const CPU_WIN = 2;
 const DRAW = 0;
